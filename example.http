@@ -1,0 +1,19 @@
+GET http://localhost:8000/
+
+> {%
+    client.test("Request executed successfully", function () {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+    client.global.set("jwt_token", response.body.jwt_token);
+%}
+
+
+###
+GET http://localhost:8000/protected
+Authorization: Bearer {{jwt_token}}
+
+
+###
+GET http://localhost:8000/protected
+Authorization: Bearer this.should.fail!=
+
