@@ -13,7 +13,10 @@ SCOPES = ["profile:read", "profile:write"]
 
 
 app = Sanic("SanicVerifyJWT-Example")
-auth = SanicVerifyJWT(app, secret_key=SECRET_KEY, audience=AUDIENCE, issuer=ISSUER)
+config_dict = dict(JWT_SECRET_KEY=SECRET_KEY, JWT_AUDIENCE=AUDIENCE, JWT_ISSUER=ISSUER)
+app.update_config(config_dict)
+
+auth = SanicVerifyJWT(app)
 
 jwt_token = jwt.encode(
     {

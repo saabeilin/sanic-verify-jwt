@@ -19,16 +19,23 @@ class SanicVerifyJWT:
         issuer: typing.Optional[str] = None,
         audience: typing.Optional[typing.Union[str, typing.List[str]]] = None,
     ):
-        self.algorithms = algorithms or ["HS256"]
+        self.algorithms = algorithms
         self.secret_key = secret_key
         self.issuer = issuer
         self.audience = audience
+        # self.protect_all = False
+        # self.protect_all_exclude = []
+        # self.protect_all_scopes = []
         if app is not None:
             self.init_app(app)
         self._app = app
 
     def init_app(self, app: Sanic):
         """hook on request start etc."""
+        self.algorithms = self.algorithms or app.config.get("JWT_ALGORITHMS", ["HS256"])
+        self.secret_key = self.secret_key or app.config.get("JWT_SECRET_KEY")
+        self.issuer = self.issuer or app.config.get("JWT_ISSUER")
+        self.audience = self.audience or app.config.get("JWT_AUDIENCE")
         app.register_middleware(self.open_session, "request")
 
     async def open_session(self, request: sanic.Request) -> None:
