@@ -13,7 +13,12 @@ SCOPES = ["profile:read", "profile:write"]
 
 
 app = Sanic("SanicVerifyJWT-Example")
-config_dict = dict(JWT_SECRET_KEY=SECRET_KEY, JWT_AUDIENCE=AUDIENCE, JWT_ISSUER=ISSUER)
+config_dict = dict(
+    JWT_SECRET_KEY=SECRET_KEY,
+    JWT_AUDIENCE=AUDIENCE,
+    JWT_ISSUER=ISSUER,
+    JWT_PROTECT_ALL=True,
+)
 app.update_config(config_dict)
 
 auth = SanicVerifyJWT(app)
@@ -35,13 +40,18 @@ jwt_token = jwt.encode(
 
 
 @app.route("/")
-async def index(request):
-    return sanic.response.json({"message": f"Go to /protected", "jwt_token": jwt_token})
+async def index(request: sanic.Request) -> sanic.response.JSONResponse:
+    return sanic.response.json({"message": "Go to /protected", "jwt_token": jwt_token})
 
 
 @app.route("/protected")
 @auth.auth_required()
-async def protected(request):
+async def protected(request: sanic.Request) -> sanic.response.JSONResponse:
+    return sanic.response.json(request.ctx.jwt)
+
+
+@app.route("/.health")
+async def health(request: sanic.Request) -> sanic.response.JSONResponse:
     return sanic.response.json(request.ctx.jwt)
 
 
