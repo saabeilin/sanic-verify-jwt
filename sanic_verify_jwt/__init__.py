@@ -63,9 +63,8 @@ class SanicVerifyJWT:
         if self.protect_all:
             if self.protect_all_exclude:
                 for excluded in self.protect_all_exclude:
-                    print(excluded, request.path)
                     if excluded == request.path or re.match(excluded, request.path):
-                        logger.info("%s matches %s", request.path, excluded)
+                        logger.debug("Excluding %s matches %s", request.path, excluded)
                         return
             if not await self._is_authenticated(
                 request, scopes=self.protect_all_scopes
